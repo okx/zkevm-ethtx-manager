@@ -22,5 +22,5 @@ type Config struct {
 	// ZkEVMAddr Address of the L1 contract polygonZkEVMAddress
 	ZkEVMAddr common.Address `mapstructure:"PolygonZkEVMAddress"`
 	// RollupManagerAddr Address of the L1 contract
-	RollupManagerAddr common.Address `mapstructure:"RollupManagerAddress"`
+	RollupManagerAddr common.Address `mapstructure:"PolygonRollupManagerAddress"`
 }
