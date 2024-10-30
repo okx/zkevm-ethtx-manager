@@ -43,7 +43,7 @@ func main() {
 	}
 	log.Init(config.Log)
 	log.Debug("Creating ethtxmanager")
-	client, err := ethtxmanager.New(config)
+	client, err := ethtxmanager.New(config, to0) // TODO: use proper address
 	if err != nil {
 		panic(err)
 	}

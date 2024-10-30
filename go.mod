@@ -1,10 +1,13 @@
 module github.com/0xPolygon/zkevm-ethtx-manager
 
-go 1.21.3
+go 1.22
+
+toolchain go1.22.8
 
 require (
 	github.com/0xPolygonHermez/zkevm-synchronizer-l1 v0.7.0
 	github.com/ethereum/go-ethereum v1.14.8
+	github.com/google/uuid v1.6.0
 	github.com/hermeznetwork/tracerr v0.3.2
 	github.com/holiman/uint256 v1.3.1
 	github.com/mattn/go-sqlite3 v1.14.23
@@ -35,9 +38,13 @@ require (
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/gofrs/flock v0.12.1 // indirect
-	github.com/google/uuid v1.6.0 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/snappy v0.0.5-0.20220116011046-fa5810519dcb // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/holiman/bloomfilter/v2 v2.0.3 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mmcloughlin/addchain v0.4.0 // indirect
@@ -55,3 +62,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
+
+require github.com/rogpeppe/go-internal v1.13.1 // indirect

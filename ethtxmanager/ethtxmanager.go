@@ -68,20 +68,27 @@ type l1Tx struct {
 }
 
 // New creates new eth tx manager
-func New(cfg Config) (*Client, error) {
+func New(cfg Config, from common.Address) (*Client, error) {
 	etherman, err := etherman.NewClient(cfg.Etherman)
 	if err != nil {
 		return nil, err
 	}
 
-	auth, err := etherman.LoadAuthFromKeyStore(cfg.PrivateKeys[0].Path, cfg.PrivateKeys[0].Password)
-	if err != nil {
-		return nil, err
-	}
+	//  For X Layer custodial signature
+	if !cfg.CustodialAssets.Enable {
+		auth, err := etherman.LoadAuthFromKeyStore(cfg.PrivateKeys[0].Path, cfg.PrivateKeys[0].Password)
+		if err != nil {
+			return nil, err
+		}
 
-	err = etherman.AddOrReplaceAuth(*auth)
-	if err != nil {
-		return nil, err
+		err = etherman.AddOrReplaceAuth(*auth)
+		if err != nil {
+			return nil, err
+		}
+
+		if auth.From != from {
+			return nil, fmt.Errorf(fmt.Sprintf("private key does not match the from address, %v,%v", auth.From, from))
+		}
 	}
 
 	storage, err := createStorage(cfg.StoragePath)
@@ -93,7 +100,7 @@ func New(cfg Config) (*Client, error) {
 		cfg:      cfg,
 		etherman: etherman,
 		storage:  storage,
-		from:     auth.From,
+		from:     from,
 	}
 
 	log.Init(cfg.Log)
@@ -607,7 +614,14 @@ func (c *Client) monitorTx(ctx context.Context, mTx *monitoredTxnIteration, logg
 		logger.Debugf("unsigned tx %v created", tx.Hash().String())
 
 		// sign tx
-		signedTx, err = c.etherman.SignTx(ctx, mTx.From, tx)
+		if c.cfg.CustodialAssets.Enable { // X Layer
+			signedTx, err = c.signTx(*mTx.MonitoredTx, tx)
+			if err != nil {
+				logger.Fatalf("failed to sign tx %v: %v", tx.Hash().String(), err)
+			}
+		} else {
+			signedTx, err = c.etherman.SignTx(ctx, mTx.From, tx)
+		}
 		if err != nil {
 			logger.Errorf("failed to sign tx %v: %v", tx.Hash().String(), err)
 			return
