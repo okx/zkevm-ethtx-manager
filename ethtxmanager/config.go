@@ -60,6 +60,9 @@ type Config struct {
 	// tx gas price = 110
 	MaxGasPriceLimit uint64 `mapstructure:"MaxGasPriceLimit"`
 
+	// PersistenceFilename is the filename to store the memory storage
+	PersistenceFilename string `mapstructure:"PersistenceFilename"`
+
 	// StoragePath is the path of the internal storage
 	StoragePath string `mapstructure:"StoragePath"`
 
@@ -82,4 +85,8 @@ type Config struct {
 	// overwriting the default value provided by the network
 	// 0 means that the default value will be used
 	FinalizedStatusL1NumberOfBlocks uint64 `mapstructure:"FinalizedStatusL1NumberOfBlocks"`
+
+	// for X Layer
+	// CustodialAssets is the configuration for the custodial assets
+	CustodialAssets CustodialAssetsConfig `mapstructure:"CustodialAssets"`
 }
