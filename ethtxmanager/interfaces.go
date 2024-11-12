@@ -7,6 +7,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+
+	zkmanTypes "github.com/0xPolygon/zkevm-ethtx-manager/types"
 )
 
 type ethermanInterface interface {
@@ -30,11 +32,11 @@ type ethermanInterface interface {
 }
 
 type storageInterface interface {
-	Add(ctx context.Context, mTx monitoredTx) error
+	Add(ctx context.Context, mTx zkmanTypes.MonitoredTx) error
 	Remove(ctx context.Context, id common.Hash) error
-	Get(ctx context.Context, id common.Hash) (monitoredTx, error)
-	GetByStatus(ctx context.Context, statuses []MonitoredTxStatus) ([]monitoredTx, error)
-	GetByBlock(ctx context.Context, fromBlock, toBlock *uint64) ([]monitoredTx, error)
-	Update(ctx context.Context, mTx monitoredTx) error
+	Get(ctx context.Context, id common.Hash) (zkmanTypes.MonitoredTx, error)
+	GetByStatus(ctx context.Context, statuses []zkmanTypes.MonitoredTxStatus) ([]zkmanTypes.MonitoredTx, error)
+	GetByBlock(ctx context.Context, fromBlock, toBlock *uint64) ([]zkmanTypes.MonitoredTx, error)
+	Update(ctx context.Context, mTx zkmanTypes.MonitoredTx) error
 	Empty(ctx context.Context) error
 }

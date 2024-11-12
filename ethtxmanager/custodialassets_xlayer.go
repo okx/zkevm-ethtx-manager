@@ -10,9 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xPolygonHermez/zkevm-ethtx-manager/etherman/smartcontracts/polygonrollupmanager_xlayer"
-	"github.com/0xPolygonHermez/zkevm-ethtx-manager/etherman/smartcontracts/polygonvalidium_xlayer"
-	"github.com/0xPolygonHermez/zkevm-ethtx-manager/log"
+	"github.com/0xPolygon/zkevm-ethtx-manager/etherman/smartcontracts/polygonrollupmanager_xlayer"
+	"github.com/0xPolygon/zkevm-ethtx-manager/etherman/smartcontracts/polygonvalidium_xlayer"
+	"github.com/0xPolygon/zkevm-ethtx-manager/log"
+	zkmanTypes "github.com/0xPolygon/zkevm-ethtx-manager/types"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -70,7 +71,7 @@ var (
 	errUnpack                    = errors.New("failed to unpack data")
 )
 
-func (c *Client) signTx(mTx monitoredTx, tx *types.Transaction) (*types.Transaction, error) {
+func (c *Client) signTx(mTx zkmanTypes.MonitoredTx, tx *types.Transaction) (*types.Transaction, error) {
 	if c == nil || !c.cfg.CustodialAssets.Enable {
 		return nil, errCustodialAssetsNotEnabled
 	}
@@ -211,7 +212,7 @@ func getGasPriceEther(gasPriceWei *big.Int) string {
 	return fmt.Sprintf("%v.%018s", compactAmount.String(), reminder.String())
 }
 
-func (s *sequenceBatchesArgs) marshal(contractAddress common.Address, mTx monitoredTx) (string, error) {
+func (s *sequenceBatchesArgs) marshal(contractAddress common.Address, mTx zkmanTypes.MonitoredTx) (string, error) {
 	if s == nil {
 		return "", fmt.Errorf("sequenceBatchesArgs is nil")
 	}
@@ -254,7 +255,7 @@ func (s *sequenceBatchesArgs) marshal(contractAddress common.Address, mTx monito
 	return string(ret), nil
 }
 
-func (v *verifyBatchesTrustedAggregatorArgs) marshal(contractAddress common.Address, mTx monitoredTx) (string, error) {
+func (v *verifyBatchesTrustedAggregatorArgs) marshal(contractAddress common.Address, mTx zkmanTypes.MonitoredTx) (string, error) {
 	if v == nil {
 		return "", fmt.Errorf("verifyBatchesTrustedAggregatorArgs is nil")
 	}
