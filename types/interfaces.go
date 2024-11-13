@@ -97,6 +97,7 @@ type EthermanInterface interface {
 	// Returns the block header and an error if it cannot be retrieved.
 	HeaderByNumber(ctx context.Context, number *big.Int) (*types.Header, error)
 
+	// Get X Layer information (address, chain ID etc.)
 	GetZkEVMAddressAndL1ChainID() (common.Address, common.Address, uint64, error)
 }
 
