@@ -97,7 +97,7 @@ type EthermanInterface interface {
 	// Returns the block header and an error if it cannot be retrieved.
 	HeaderByNumber(ctx context.Context, number *big.Int) (*types.Header, error)
 
-  GetZkEVMAddressAndL1ChainID() (common.Address, common.Address, uint64, error)
+	GetZkEVMAddressAndL1ChainID() (common.Address, common.Address, uint64, error)
 }
 
 // StorageInterface defines the methods required to interact with
