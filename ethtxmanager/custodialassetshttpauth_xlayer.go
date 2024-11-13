@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/md5"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -76,9 +75,13 @@ func (c *Client) genAuth(ctx context.Context, req *http.Request, algorithm strin
 	return c.generateSignature(ctx, treeMap, body.String(), algorithm)
 }
 
-func (c *Client) generateSignature(ctx context.Context, treeMap map[string][]string, body, algorithm string) (string, error) {
+func (c *Client) generateSignature(
+	ctx context.Context,
+	treeMap map[string][]string,
+	body, algorithm string,
+) (string, error) {
 	// Sort the map by values
-	var keys []string
+	keys := make([]string, 0, len(treeMap))
 	for key := range treeMap {
 		keys = append(keys, key)
 	}
@@ -102,8 +105,8 @@ func (c *Client) generateSignature(ctx context.Context, treeMap map[string][]str
 	switch strings.ToLower(algorithm) {
 	case "sha256":
 		hash = signBySha256(content.String())
-	case "md5":
-		hash = signByMd5(content.String())
+	// case "md5":
+	// 	hash = signByMd5(content.String())
 	default:
 		// Handle unsupported algorithm
 		return "", fmt.Errorf("unsupported algorithm: %v", algorithm)
@@ -126,11 +129,11 @@ func (bw *bufferWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func signByMd5(content string) []byte {
-	hash := md5.New() // golint:ignore
-	hash.Write([]byte(content))
-	return []byte(hex.EncodeToString(hash.Sum(nil)))
-}
+// func signByMd5(content string) []byte {
+// 	hash := md5.New() // golint:ignore
+// 	hash.Write([]byte(content))
+// 	return []byte(hex.EncodeToString(hash.Sum(nil)))
+// }
 
 func signBySha256(content string) []byte {
 	hash := sha256.New()
@@ -147,7 +150,7 @@ func encryptAES(src, key string) (string, error) {
 	content := []byte(src)
 	content = PKCS5Padding(content, block.BlockSize())
 	des := make([]byte, len(content))
-	err = ecbEncrypt.(*ecbEncrypter).cryptBlocksWithError(des, content)
+	err = ecbEncrypt.(*ecbEncrypter).cryptBlocksWithError(des, content) //nolint:all
 	if err != nil {
 		return "", fmt.Errorf("failed to encrypt AES: %v", err)
 	}

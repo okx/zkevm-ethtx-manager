@@ -1,14 +1,12 @@
 package ethtxmanager
 
 import (
-	"github.com/ethereum/go-ethereum/common"
-
 	"github.com/0xPolygon/zkevm-ethtx-manager/etherman"
 	"github.com/0xPolygon/zkevm-ethtx-manager/log"
+	"github.com/ethereum/go-ethereum/common"
 )
 
-// We only use this for signing our tx
-func NewWithFrom(cfg Config, from common.Address) (*Client, error) {
+func NewClientFromAddr(cfg Config, from common.Address) (*Client, error) { //nolint:all
 	etherman, err := etherman.NewClient(cfg.Etherman)
 	if err != nil {
 		return nil, err

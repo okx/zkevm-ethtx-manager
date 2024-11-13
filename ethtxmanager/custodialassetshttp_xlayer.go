@@ -15,11 +15,10 @@ import (
 
 	"github.com/0xPolygon/zkevm-ethtx-manager/hex"
 	"github.com/0xPolygon/zkevm-ethtx-manager/log"
+	zkmanTypes "github.com/0xPolygon/zkevm-ethtx-manager/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/google/uuid"
-
-	zkmanTypes "github.com/0xPolygon/zkevm-ethtx-manager/types"
 )
 
 type signRequest struct {
@@ -235,7 +234,11 @@ func (c *Client) waitResult(parentCtx context.Context, request *signResultReques
 	}
 }
 
-func (c *Client) postSignRequestAndWaitResult(ctx context.Context, mTx zkmanTypes.MonitoredTx, request *signRequest) (*types.Transaction, error) {
+func (c *Client) postSignRequestAndWaitResult(
+	ctx context.Context,
+	mTx zkmanTypes.MonitoredTx,
+	request *signRequest,
+) (*types.Transaction, error) {
 	if c == nil || !c.cfg.CustodialAssets.Enable {
 		return nil, errCustodialAssetsNotEnabled
 	}
@@ -268,7 +271,12 @@ func (c *Client) postSignRequestAndWaitResult(ctx context.Context, mTx zkmanType
 	return transaction, nil
 }
 
-func (c *Client) checkSignedTransaction(ctx context.Context, mTx zkmanTypes.MonitoredTx, transaction *types.Transaction, request *signRequest) error {
+func (c *Client) checkSignedTransaction(
+	ctx context.Context,
+	mTx zkmanTypes.MonitoredTx,
+	transaction *types.Transaction,
+	request *signRequest,
+) error {
 	if c == nil || !c.cfg.CustodialAssets.Enable {
 		return errCustodialAssetsNotEnabled
 	}
@@ -302,8 +310,14 @@ func (c *Client) checkSignedTransaction(ctx context.Context, mTx zkmanTypes.Moni
 	default:
 		return fmt.Errorf("error operate type: %v", request.OperateType)
 	}
-	mLog.Infof("signed transaction nonce: %v to: %v gas limit: %v gas price: %v chainID: %v", transaction.Nonce(), transaction.To(), transaction.Gas(), transaction.GasPrice(), transaction.ChainId())
-	mLog.Infof("mTx    transaction nonce: %v to: %v gas limit: %v gas price: %v chainID: %v", mTx.Nonce, mTx.To.String(), mTx.Gas+mTx.GasOffset, mTx.GasPrice.String(), l1ChainID)
+	mLog.Infof(
+		"signed transaction nonce: %v to: %v gas limit: %v gas price: %v chainID: %v",
+		transaction.Nonce(), transaction.To(), transaction.Gas(), transaction.GasPrice(), transaction.ChainId(),
+	)
+	mLog.Infof(
+		"mTx    transaction nonce: %v to: %v gas limit: %v gas price: %v chainID: %v",
+		mTx.Nonce, mTx.To.String(), mTx.Gas+mTx.GasOffset, mTx.GasPrice.String(), l1ChainID,
+	)
 	if signedRequest != request.OtherInfo {
 		return fmt.Errorf("signed transaction not equal with other info: %v, %v", signedRequest, request.OtherInfo)
 	}
@@ -324,9 +338,15 @@ func (c *Client) checkSignedTransaction(ctx context.Context, mTx zkmanTypes.Moni
 		return fmt.Errorf("signed transaction gas limit not equal with mTx: %v, %v", transaction.Gas(), mTx.Gas)
 	}
 	if transaction.GasPrice().Cmp(mTx.GasPrice) != 0 {
-		mLog.Warnf("signed transaction gas price not equal with mTx: %v, %v", transaction.GasPrice().String(), mTx.GasPrice.String())
+		mLog.Warnf(
+			"signed transaction gas price not equal with mTx: %v, %v",
+			transaction.GasPrice().String(), mTx.GasPrice.String(),
+		)
 		if math.Abs(float64(new(big.Int).Sub(transaction.GasPrice(), mTx.GasPrice).Int64())) > gasPricesThreshold {
-			return fmt.Errorf("signed transaction and mTx gas price difference exceeds the threshold: %v, %v, %v", transaction.GasPrice().String(), mTx.GasPrice.String(), gasPricesThreshold)
+			return fmt.Errorf(
+				"signed transaction and mTx gas price difference exceeds the threshold: %v, %v, %v",
+				transaction.GasPrice().String(), mTx.GasPrice.String(), gasPricesThreshold,
+			)
 		}
 	}
 	if transaction.ChainId().Uint64() != l1ChainID {
