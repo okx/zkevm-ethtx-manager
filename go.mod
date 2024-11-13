@@ -5,6 +5,7 @@ go 1.21.3
 require (
 	github.com/0xPolygonHermez/zkevm-synchronizer-l1 v0.7.0
 	github.com/ethereum/go-ethereum v1.14.8
+	github.com/google/uuid v1.6.0
 	github.com/hermeznetwork/tracerr v0.3.2
 	github.com/holiman/uint256 v1.3.1
 	github.com/mattn/go-sqlite3 v1.14.23
@@ -35,7 +36,6 @@ require (
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/gofrs/flock v0.12.1 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect

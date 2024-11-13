@@ -96,6 +96,9 @@ type EthermanInterface interface {
 	// HeaderByNumber is an alias for GetHeaderByNumber. It retrieves the block header for a specific block number.
 	// Returns the block header and an error if it cannot be retrieved.
 	HeaderByNumber(ctx context.Context, number *big.Int) (*types.Header, error)
+
+	// Get X Layer information (address, chain ID etc.)
+	GetZkEVMAddressAndL1ChainID() (common.Address, common.Address, uint64, error)
 }
 
 // StorageInterface defines the methods required to interact with
