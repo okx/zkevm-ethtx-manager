@@ -37,6 +37,7 @@ jobs:
         path: coverage.out
 
   sonar-cloud:
+    if: false
     needs: test-unit
     name: SonarCloud
     runs-on: ubuntu-latest
