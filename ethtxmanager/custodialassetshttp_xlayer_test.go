@@ -2,6 +2,7 @@ package ethtxmanager
 
 import (
 	"context"
+	"encoding/json"
 	"math/big"
 	"testing"
 	"time"
@@ -11,6 +12,7 @@ import (
 	zkmanTypes "github.com/0xPolygon/zkevm-ethtx-manager/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -28,12 +30,12 @@ const (
 	// contractAddr = "812cB73e48841a6736bB94c65c56341817cE6304"
 )
 
-func TestUnpackMarshalSeqFork12(t *testing.T) {
-	client := &Client{
+func createTestClient(enable bool) *Client {
+	return &Client{
 		etherman: mockEtherman{},
 		cfg: Config{
 			CustodialAssets: CustodialAssetsConfig{
-				Enable:            false,
+				Enable:            enable,
 				URL:               domain,
 				Symbol:            2882,
 				SequencerAddr:     common.HexToAddress(seqAddr),
@@ -53,6 +55,10 @@ func TestUnpackMarshalSeqFork12(t *testing.T) {
 			},
 		},
 	}
+}
+
+func TestUnpackMarshalSeqFork12(t *testing.T) {
+	client := createTestClient(false)
 
 	// Fork13 contract example TX data
 	// Source: https://sepolia.etherscan.io/tx/0x2e361e9e6515f4ceef4d235a88878bc87a4be0c261995f2ef160264e56691641
@@ -69,47 +75,22 @@ func TestUnpackMarshalSeqFork12(t *testing.T) {
 	}
 
 	args, err := client.unpackSequenceBatchesTx(mTx.Tx())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(args.Batches) != 12 {
-		t.Fatalf("Expected 12 batches, Got = %d\n", 12)
-	}
-	if args.L2Coinbase != to {
-		t.Fatalf("Expected %s, got = %s\n", to, args.L2Coinbase)
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, len(args.Batches), 12)
+	assert.Equal(t, args.L2Coinbase, to)
 
-	_, err = args.marshal(common.HexToAddress(contractAddr), mTx)
-	if err != nil {
-		t.Fatal(err)
-	}
+	byteStr, err := args.marshal(common.HexToAddress(contractAddr), mTx)
+	assert.Nil(t, err)
+	expectedByteStr := `{"batches":[{"transactionsHash":"14df0077a11ccf22bd14d1ec3e209ba5d8e065ce73556fdc8fb9c19b83af4ec3","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"cb974e114004736273079d8f2fb4c703de79e14eea80f77e14abc5a1cd3d169b","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"14df0077a11ccf22bd14d1ec3e209ba5d8e065ce73556fdc8fb9c19b83af4ec3","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"14df0077a11ccf22bd14d1ec3e209ba5d8e065ce73556fdc8fb9c19b83af4ec3","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"dd6adb9b5339c8211dc51e7a58a554ed96cf79e3ee7fc2584989fc59f9498a85","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"14df0077a11ccf22bd14d1ec3e209ba5d8e065ce73556fdc8fb9c19b83af4ec3","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"dd6adb9b5339c8211dc51e7a58a554ed96cf79e3ee7fc2584989fc59f9498a85","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"14df0077a11ccf22bd14d1ec3e209ba5d8e065ce73556fdc8fb9c19b83af4ec3","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"dd6adb9b5339c8211dc51e7a58a554ed96cf79e3ee7fc2584989fc59f9498a85","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"dd6adb9b5339c8211dc51e7a58a554ed96cf79e3ee7fc2584989fc59f9498a85","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"6a1686e10575fe5046ef79d653dde24a3ade0d4a82aad51956ad6268e3f33cca","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"},{"transactionsHash":"14df0077a11ccf22bd14d1ec3e209ba5d8e065ce73556fdc8fb9c19b83af4ec3","forcedGlobalExitRoot":"0000000000000000000000000000000000000000000000000000000000000000","forcedTimestamp":0,"forcedBlockHashL1":"0000000000000000000000000000000000000000000000000000000000000000"}],"maxSequenceTimestamp":1730986727,"initSequencedBatch":0,"l2Coinbase":"0x4820e45eb6cf99074389544f83fe1f30084bdab7","dataAvailabilityMessage":"6810c9dd47ba22910ff6045631ea61f3c723104859aa392eaa2c3dbadb2bf8c411ff640c48b18ec9b6efe6bfde82414731db333dfb1b09185c10c3281c6dbee61cf39fd6e51aad88f6f4ce6ab8827279cfffb92266","contractAddress":"0x8947dc90862f386968966b22dfe5edf96435bc2f","gasLimit":50000,"gasPrice":"0.000000000000000010","nonce":0}`
+	expected := make(map[string]interface{})
+	got := make(map[string]interface{})
+	json.Unmarshal([]byte(expectedByteStr), &expected)
+	json.Unmarshal([]byte(byteStr), &got)
+	assert.EqualValues(t, expected, got, "Byte strings do not line up.")
 }
 
 func TestUnpackMarshalAggFork12(t *testing.T) {
-	client := &Client{
-		etherman: mockEtherman{},
-		cfg: Config{
-			CustodialAssets: CustodialAssetsConfig{
-				Enable:            false,
-				URL:               domain,
-				Symbol:            2882,
-				SequencerAddr:     common.HexToAddress(seqAddr),
-				AggregatorAddr:    common.HexToAddress(aggAddr),
-				WaitResultTimeout: zktypes.NewDuration(4 * time.Minute),
-				OperateTypeSeq:    3,
-				OperateTypeAgg:    4,
-				ProjectSymbol:     3011,
-				OperateSymbol:     2,
-				SysFrom:           3,
-				UserID:            0,
-				OperateAmount:     0,
-				RequestSignURI:    "/priapi/v1/assetonchain/ecology/ecologyOperate",
-				QuerySignURI:      "/priapi/v1/assetonchain/ecology/querySignDataByOrderNo",
-				AccessKey:         AccessKey,
-				SecretKey:         SecretKey,
-			},
-		},
-	}
+	client := createTestClient(false)
 
 	// Same sample data used in Fork8 (since contract method did not change)
 	data, _ := hex.DecodeHex("0x1489ed100000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500ae00000000000000000000000000000000000000000000000000000000000500b33d2b755195521747e8b32d1f28b033f0d93082872cd253ee42e3bcfaf2cd8a3129e24287e603ff699b4322778e511f2bf9f4d305f199403c24db686e44c5b1cf000000000000000000000000a57d7641fba20d916a7cb61de5af71e9743e4b571666fc7a9b894634feba222cebcf0678a56b2b6348e31af2eddea7b98fc9b36a017778ab8f75848be64ffeaf6974eb09369e01a96c6c443d611289e3b18ebcae02fa881020960c0cd3fc9819024a60e1869baead40db9422af24947c1ec825d31f3643021dd597b4b6799b1669e50d5ccc29dcab571308b4afd9f69856b6f1cf1560e3fdedf10b3b9b0fa9ebb9a09af91ebd61c3722274eef718948620bcc84a22ba517411823319b4fad2bac5ca0d30f72261ca3a291fe11ee3f2d65f21947c2cda3b57c03ea3d576cef736b45185e6a4f7e2fae3d2e1442245ac6cf906032d032cb2ce822d9e16521b862e46fa28bc62ce12f0804fa057e8ecef7bff12d72423095607eb51333715cdc3cd39d316e02ef9d92ce24ec75518353670b87b48a7178bb86cb37a5c2b08b8705977b3d046a8f7777dbcb988f6a8508d9ebe3c3ce42f33985c054be78209809df36aa39ebecc34c44bbdf116ba4226613b5f2562b41139c17ccf95c2791327defc83fc7e611bc8e08aa72a9bca9138652f8ca9742f25eb11f74ffd3737e147acb9dd4cbffc298860cfab785c4e9b5cceb92aafe344262278e991e0d715bd9a66aafe8153b723b9ca7ac050205970cfc85a8dca1cad2a22a2b4642d0217277893d12d1ede382ca42eed04b686a9229eb3fed45d838b27474a3242ee89ded32881b4abc11fd072d7b718af15171364c7f5b285f5da8d303245456ec4e9beb1c2930cb7db35b4ab991a7ea48a2373a4c2ef201ba4151c15e12c35f10e806ab5fd807fb6cf20255ca28e54d5952dba961b510af29296c7240e73818dfef35e5919998ce4885fc9671c0379f63479f2d61197725916b1a814b67a71ce84f0148fd0205ff1bc3e20df8a0e4a1180cecc57cdaa4f690c07bb2010b9e0c3d25daa958dbdbaad240e5900a97e8d0e75197f983b7870188775471344ab8ee51610daf6f634de0407c9d24ca762a38a6f2ba44d4114749c616d972bfbfd7cb939ababbf9e6d1d569b9a3ff396ab3475b3bfe3332b3ac218c2f6e516780ca06e7ec5a98c542686c92c2c2ff09cff58101df7824b01aa6b0b85e206")
@@ -125,20 +106,19 @@ func TestUnpackMarshalAggFork12(t *testing.T) {
 	}
 
 	args, err := client.unpackVerifyBatchesTrustedAggregatorTx(mTx.Tx())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if args.RollupId != 1 {
-		t.Fatalf("Got = %d\n", args.RollupId)
-	}
-	if args.Beneficiary != common.HexToAddress("0xa57d7641FBA20D916A7cb61DE5AF71e9743e4B57") {
-		t.Fatalf("Got = %s\n", args.Beneficiary)
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, args.RollupId, uint64(1))
+	assert.Equal(t, args.Beneficiary, common.HexToAddress("0xa57d7641FBA20D916A7cb61DE5AF71e9743e4B57"))
 
-	_, err = args.marshal(common.HexToAddress(contractAddrAgg), mTx)
-	if err != nil {
-		t.Fatal(err)
-	}
+	byteStr, err := args.marshal(common.HexToAddress(contractAddrAgg), mTx)
+	assert.Nil(t, err)
+	expectedByteStr := `{"rollupID":1,"pendingStateNum":0,"initNumBatch":327854,"finalNewBatch":327859,"newLocalExitRoot":"3d2b755195521747e8b32d1f28b033f0d93082872cd253ee42e3bcfaf2cd8a31","newStateRoot":"29e24287e603ff699b4322778e511f2bf9f4d305f199403c24db686e44c5b1cf","beneficiary":"0xa57d7641fba20d916a7cb61de5af71e9743e4b57","proof":["1666fc7a9b894634feba222cebcf0678a56b2b6348e31af2eddea7b98fc9b36a","017778ab8f75848be64ffeaf6974eb09369e01a96c6c443d611289e3b18ebcae","02fa881020960c0cd3fc9819024a60e1869baead40db9422af24947c1ec825d3","1f3643021dd597b4b6799b1669e50d5ccc29dcab571308b4afd9f69856b6f1cf","1560e3fdedf10b3b9b0fa9ebb9a09af91ebd61c3722274eef718948620bcc84a","22ba517411823319b4fad2bac5ca0d30f72261ca3a291fe11ee3f2d65f21947c","2cda3b57c03ea3d576cef736b45185e6a4f7e2fae3d2e1442245ac6cf906032d","032cb2ce822d9e16521b862e46fa28bc62ce12f0804fa057e8ecef7bff12d724","23095607eb51333715cdc3cd39d316e02ef9d92ce24ec75518353670b87b48a7","178bb86cb37a5c2b08b8705977b3d046a8f7777dbcb988f6a8508d9ebe3c3ce4","2f33985c054be78209809df36aa39ebecc34c44bbdf116ba4226613b5f2562b4","1139c17ccf95c2791327defc83fc7e611bc8e08aa72a9bca9138652f8ca9742f","25eb11f74ffd3737e147acb9dd4cbffc298860cfab785c4e9b5cceb92aafe344","262278e991e0d715bd9a66aafe8153b723b9ca7ac050205970cfc85a8dca1cad","2a22a2b4642d0217277893d12d1ede382ca42eed04b686a9229eb3fed45d838b","27474a3242ee89ded32881b4abc11fd072d7b718af15171364c7f5b285f5da8d","303245456ec4e9beb1c2930cb7db35b4ab991a7ea48a2373a4c2ef201ba4151c","15e12c35f10e806ab5fd807fb6cf20255ca28e54d5952dba961b510af29296c7","240e73818dfef35e5919998ce4885fc9671c0379f63479f2d61197725916b1a8","14b67a71ce84f0148fd0205ff1bc3e20df8a0e4a1180cecc57cdaa4f690c07bb","2010b9e0c3d25daa958dbdbaad240e5900a97e8d0e75197f983b787018877547","1344ab8ee51610daf6f634de0407c9d24ca762a38a6f2ba44d4114749c616d97","2bfbfd7cb939ababbf9e6d1d569b9a3ff396ab3475b3bfe3332b3ac218c2f6e5","16780ca06e7ec5a98c542686c92c2c2ff09cff58101df7824b01aa6b0b85e206"],"contractAddress":"0x1d5298ee11f7cd56fb842b7894346bfb2e47a95f","gasLimit":50000,"gasPrice":"0.000000000000000010","nonce":0}`
+	assert.Nil(t, err)
+	expected := make(map[string]interface{})
+	got := make(map[string]interface{})
+	json.Unmarshal([]byte(expectedByteStr), &expected)
+	json.Unmarshal([]byte(byteStr), &got)
+	assert.EqualValues(t, expected, got, "Byte strings do not line up.")
 }
 
 type mockEtherman struct{}
