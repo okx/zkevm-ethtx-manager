@@ -3,6 +3,7 @@ module github.com/0xPolygon/zkevm-ethtx-manager
 go 1.21.3
 
 require (
+	github.com/0xPolygon/cdk-contracts-tooling v0.0.0-20240826154954-f6182d2b17a2
 	github.com/0xPolygonHermez/zkevm-synchronizer-l1 v0.7.0
 	github.com/ethereum/go-ethereum v1.14.8
 	github.com/google/uuid v1.6.0
