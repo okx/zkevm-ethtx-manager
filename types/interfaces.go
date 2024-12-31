@@ -15,6 +15,10 @@ var (
 	ErrNotFound = errors.New("not found")
 	// ErrAlreadyExists when the object already exists
 	ErrAlreadyExists = errors.New("already exists")
+
+	// ErrExecutionReverted returned when trying to get the revert message
+	// but the call fails without revealing the revert reason
+	ErrExecutionReverted = errors.New("execution reverted")
 )
 
 // EthermanInterface defines a set of methods for interacting with the Ethereum blockchain,

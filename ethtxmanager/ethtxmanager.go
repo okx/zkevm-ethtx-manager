@@ -31,17 +31,6 @@ import (
 
 const failureIntervalInSeconds = 5
 
-var (
-	// ErrNotFound when the object is not found
-	ErrNotFound = errors.New("not found")
-	// ErrAlreadyExists when the object already exists
-	ErrAlreadyExists = errors.New("already exists")
-
-	// ErrExecutionReverted returned when trying to get the revert message
-	// but the call fails without revealing the revert reason
-	ErrExecutionReverted = errors.New("execution reverted")
-)
-
 // Client for eth tx manager
 type Client struct {
 	ctx    context.Context
@@ -397,7 +386,7 @@ func (c *Client) buildResult(ctx context.Context, mTx types.MonitoredTx) (types.
 		}
 
 		revertMessage, err := c.etherman.GetRevertMessage(ctx, tx)
-		if !errors.Is(err, ethereum.NotFound) && err != nil && err.Error() != ErrExecutionReverted.Error() {
+		if !errors.Is(err, ethereum.NotFound) && err != nil && err.Error() != types.ErrExecutionReverted.Error() {
 			return types.MonitoredTxResult{}, err
 		}
 
@@ -623,7 +612,7 @@ func (c *Client) monitorTx(ctx context.Context, mTx *monitoredTxnIteration, logg
 
 		// add tx to monitored tx history
 		err = mTx.AddHistory(signedTx)
-		if errors.Is(err, ErrAlreadyExists) {
+		if errors.Is(err, types.ErrAlreadyExists) {
 			logger.Infof("signed tx already existed in the history")
 		} else if err != nil {
 			logger.Errorf("failed to add signed tx %v to monitored tx history: %v", signedTx.Hash().String(), err)
@@ -744,7 +733,7 @@ func (c *Client) shouldContinueToMonitorThisTx(ctx context.Context, receipt *eth
 	_, err = c.etherman.GetRevertMessage(ctx, tx)
 	if err != nil {
 		// if the error when getting the revert message is not identified, continue to monitor
-		if err.Error() == ErrExecutionReverted.Error() {
+		if err.Error() == types.ErrExecutionReverted.Error() {
 			return true
 		} else {
 			log.Errorf(
